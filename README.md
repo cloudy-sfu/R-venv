@@ -67,3 +67,30 @@ Run the following command.
 deactivate.ps1
 ```
 
+
+
+### Install packages in virtual environment
+
+Let packages' names to install be `pkg1`, `pkg2`, ...
+
+Run the following command.
+
+```
+Rscript venv.R install pkg1 pkg2 ...
+```
+
+Arguments same as `dump` mode, after all the package names.
+
+
+
+### Uninstall packages in virtual environment
+
+Let packages' names to uninstall be `pkg1`, `pkg2`, ...
+
+Run the following command.
+
+```
+Rscript venv.R uninstall pkg1 pkg2 ...
+```
+
+Arguments same as `dump` mode, after all the package names.

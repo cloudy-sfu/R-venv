@@ -3,8 +3,10 @@
 # ── CLI Argument Parsing ──
 args <- commandArgs(trailingOnly = TRUE)
 
-if (length(args) == 0 || !(args[1] %in% c("load", "dump"))) {
-  stop("Usage: Rscript venv.R <load|dump> [--path PATH] [--req PATH] [--cran URL]")
+valid_cmds <- c("load", "dump", "install", "uninstall")
+
+if (length(args) == 0 || !(args[1] %in% valid_cmds)) {
+  stop("Usage: Rscript venv.R <load|dump|install|uninstall> [--path PATH] [--req PATH] [--cran URL] [packages...]")
 }
 mode <- args[1]
 
@@ -13,20 +15,72 @@ venv_path   <- ".venv"
 req_path    <- "requirements.csv"
 cran_mirror <- "https://cloud.r-project.org"
 
+# ── Separate named options from positional package names ──
+rest <- args[-1]
+pkg_args   <- character(0)
+named_args <- character(0)
+
+i <- 1
+while (i <= length(rest)) {
+  if (grepl("^--", rest[i])) {
+    # named arg: consume key + value
+    if (i + 1 > length(rest)) stop(paste("Missing value for", rest[i]))
+    named_args <- c(named_args, rest[i], rest[i + 1])
+    i <- i + 2
+  } else {
+    # positional arg (package name)
+    pkg_args <- c(pkg_args, rest[i])
+    i <- i + 1
+  }
+}
+
 # ── Parse named arguments ──
-named_args <- args[-1]
 i <- 1
 while (i <= length(named_args)) {
   key <- named_args[i]
-  if (i + 1 > length(named_args)) stop(paste("Missing value for", key))
   val <- named_args[i + 1]
   switch(key,
-    "--path"   = { venv_path   <- val },
-    "--req"    = { req_path    <- val },
+    "--path" = { venv_path   <- val },
+    "--req"  = { req_path    <- val },
     "--cran" = { cran_mirror <- val },
     stop(paste("Unknown argument:", key))
   )
   i <- i + 2
+}
+
+# ── install mode ──
+if (mode == "install") {
+  if (length(pkg_args) == 0) stop("Provide one or more package names to install.")
+  if (!dir.exists(venv_path)) dir.create(venv_path, recursive = TRUE)
+
+  message("Installing: ", paste(pkg_args, collapse = ", "))
+  install.packages(
+    pkg_args,
+    lib          = venv_path,
+    repos        = cran_mirror,
+    dependencies = TRUE
+  )
+  q(status = 0)
+}
+
+# ── uninstall mode ──
+if (mode == "uninstall") {
+  if (length(pkg_args) == 0) stop("Provide one or more package names to uninstall.")
+
+  installed <- installed.packages(lib.loc = venv_path)[, "Package"]
+  to_remove <- pkg_args[pkg_args %in% installed]
+  not_found <- pkg_args[!(pkg_args %in% installed)]
+
+  if (length(not_found) > 0) {
+    message("Not installed (skipped): ", paste(not_found, collapse = ", "))
+  }
+  if (length(to_remove) > 0) {
+    message("Removing: ", paste(to_remove, collapse = ", "))
+    remove.packages(to_remove, lib = venv_path)
+  } else {
+    message("Nothing to remove.")
+  }
+  q(status = 0)
 }
 
 # ── Dump mode: export installed packages ──
