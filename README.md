@@ -1,5 +1,5 @@
 # R venv
-Virtual environment (personal library) management scripts of R language
+Manage R language virtual environment (personal library) in Pythonic way
 
 
 
@@ -49,13 +49,25 @@ Arguments same as `dump` mode.
 
 ### Activate
 
-Let `$path` be the file path of virtual environment folder.
-
 Run the following command.
 
 ```
-activate.ps1 $path
+activate.ps1
 ```
+
+>   [!note]
+>
+>   **Customized virtual environment path**
+>
+>   The default virtual environment path is `.venv`.
+>
+>   Otherwise, let `$path` be the file path of virtual environment folder.
+>
+>   Run the following command.
+>
+>   ```
+>   activate.ps1 $path
+>   ```
 
 
 

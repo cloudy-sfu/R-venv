@@ -6,7 +6,8 @@ args <- commandArgs(trailingOnly = TRUE)
 valid_cmds <- c("load", "dump", "install", "uninstall")
 
 if (length(args) == 0 || !(args[1] %in% valid_cmds)) {
-  stop("Usage: Rscript venv.R <load|dump|install|uninstall> [--path PATH] [--req PATH] [--cran URL] [packages...]")
+  stop("Usage: Rscript venv.R <load|dump|install|uninstall> ",
+       "[--path PATH] [--req PATH] [--cran URL] [packages...]")
 }
 mode <- args[1]
 
@@ -50,7 +51,9 @@ while (i <= length(named_args)) {
 
 # ── install mode ──
 if (mode == "install") {
-  if (length(pkg_args) == 0) stop("Provide one or more package names to install.")
+  if (length(pkg_args) == 0) {
+    stop("Provide one or more package names to install.")
+  }
   if (!dir.exists(venv_path)) dir.create(venv_path, recursive = TRUE)
 
   message("Installing: ", paste(pkg_args, collapse = ", "))
@@ -65,7 +68,9 @@ if (mode == "install") {
 
 # ── uninstall mode ──
 if (mode == "uninstall") {
-  if (length(pkg_args) == 0) stop("Provide one or more package names to uninstall.")
+  if (length(pkg_args) == 0) {
+    stop("Provide one or more package names to uninstall.")
+  }
 
   installed <- installed.packages(lib.loc = venv_path)[, "Package"]
   to_remove <- pkg_args[pkg_args %in% installed]
@@ -121,7 +126,8 @@ for (i in seq_len(nrow(pkgs))) {
 all_deps <- unique(all_deps)
 leaves   <- pkg_names_new[!(pkg_names_new %in% all_deps)]
 
-message("Installing leaves (CRAN resolves the rest):\n", paste(leaves, collapse = ", "))
+message("Installing leaves (CRAN resolves the rest):\n",
+        paste(leaves, collapse = ", "))
 
 install.packages(
   leaves,
