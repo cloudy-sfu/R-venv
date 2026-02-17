@@ -15,7 +15,7 @@ $newLine = "R_LIBS_USER=`"$resolvedPath`""
 if (Test-Path $renvironFile) {
     $lines = Get-Content $renvironFile | Where-Object { $_ -notmatch '^R_LIBS_USER=' }
     $lines = @($lines) + $newLine
-    $lines | Set-Content $renvirnFile -Encoding UTF8
+    $lines | Set-Content $renvironFile -Encoding UTF8
 } else {
     $newLine | Set-Content $renvironFile -Encoding UTF8
 }

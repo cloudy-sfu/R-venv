@@ -61,7 +61,6 @@ if (mode == "install") {
     pkg_args,
     lib          = venv_path,
     repos        = cran_mirror,
-    dependencies = TRUE
   )
   q(status = 0)
 }
@@ -90,7 +89,7 @@ if (mode == "uninstall") {
 
 # ── Dump mode: export installed packages ──
 if (mode == "dump") {
-  pkgs   <- installed.packages(lib.loc = venv_path)
+  pkgs   <- installed.packages(lib.loc = venv_path, noCache = TRUE)
   pkgs_1 <- pkgs[, c("Package", "Version", "Depends", "Imports", "Built")]
   write.csv(pkgs_1, req_path, row.names = FALSE)
   message("Dumped package list to ", req_path)
@@ -133,5 +132,4 @@ install.packages(
   leaves,
   lib          = venv_path,
   repos        = cran_mirror,
-  dependencies = TRUE
 )
